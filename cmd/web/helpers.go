@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
 
-func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData){
+func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
 	ts, ok := app.templateCache[name]
 	if !ok {
 		app.serverError(w, fmt.Errorf("The template named %s does not exist", name))
@@ -19,7 +20,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 	// Write the template to the buffer, instead of straight to the
 	// http.ResponseWriter. If there's an error, call our serverError helper and
 	// return.
-	err := ts.Execute(buf, td)
+	err := ts.Execute(buf, app.addDefaultData(td, r))
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -37,6 +38,16 @@ func (app *application) serverError(w http.ResponseWriter, err error) {
 
 func (app *application) clientError(w http.ResponseWriter, statusCode int) {
 	http.Error(w, http.StatusText(statusCode), statusCode)
+}
+
+func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
+	if td == nil {
+		td = &templateData{}
+	}
+	td.CurrentYear = time.Now().Year()
+	// Add the flash message to the template data, if one exists.
+	td.Flash = app.sessions.PopString(r, "flash")
+	return td
 }
 
 // Just a wrapper around client error specifically for the ont found error

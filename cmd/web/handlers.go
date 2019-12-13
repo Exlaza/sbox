@@ -41,10 +41,7 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash := app.sessions.PopString(r, "Flash")
-
 	app.render(w, r, "show.page.tmpl", &templateData{
-		Flash: flash,
 		Snippet: s,
 	})
 
