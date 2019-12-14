@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/justinas/nosurf"
 )
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
@@ -30,6 +32,10 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 
 }
 
+func (app *application) authenticatedUser(r *http.Request) int {
+	return app.sessions.GetInt(r, "userID")
+}
+
 func (app *application) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	app.errorLog.Println(trace)
@@ -44,9 +50,11 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 	if td == nil {
 		td = &templateData{}
 	}
+	td.CSRFToken = nosurf.Token(r)
+	td.AuthenticatedUser = app.authenticatedUser(r)
 	td.CurrentYear = time.Now().Year()
 	// Add the flash message to the template data, if one exists.
-	td.Flash = app.sessions.PopString(r, "flash")
+	td.Flash = app.sessions.PopString(r, "Flash")
 	return td
 }
 

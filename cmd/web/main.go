@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -21,6 +22,7 @@ type application struct {
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
 	sessions      *sessions.Session
+	users         *mysql.UserModel
 }
 
 func main() {
@@ -54,12 +56,22 @@ func main() {
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: tc,
 		sessions:      session,
+		users: &mysql.UserModel{DB: db},
+	}
+
+	tlsConfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
 	}
 
 	srv := &http.Server{
-		Addr:     *addr,
-		ErrorLog: errorLog,
-		Handler:  app.routes(),
+		Addr:         *addr,
+		ErrorLog:     errorLog,
+		Handler:      app.routes(),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	infoLog.Printf("Starting server on %s", *addr)
