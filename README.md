@@ -2,6 +2,10 @@
 
 Based on [Let's Go!](https://lets-go.alexedwards.net/)
 
+## Demo Link
+
+Go [Here](http://ec2-35-178-204-141.eu-west-2.compute.amazonaws.com:8080/)
+
 ## Prerequisites
 
 1. Install Go
@@ -112,11 +116,3 @@ $ go run ./cmd/web
 ```
 
 Using your browser, go to `https://localhost:4000` 
-
-## Testing
-
-To test, run
-
-```sh
-$ go test ./...
-```
