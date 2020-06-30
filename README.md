@@ -2,9 +2,7 @@
 
 Based on [Let's Go!](https://lets-go.alexedwards.net/)
 
-## Demo Link
-
-Go [Here](http://ec2-35-178-204-141.eu-west-2.compute.amazonaws.com:8080/)
+![Screengrab](https://github.com/Exlaza/sbox/blob/master/screenshots/lets-go-screenshot.png)
 
 ## Prerequisites
 
